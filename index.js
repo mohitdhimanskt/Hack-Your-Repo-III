@@ -1,61 +1,138 @@
-const { createAndAppend } = window.Util;
-
-  class ContributorsView {
-    constructor(container) {
-      this.container = container;
+async function fetchJSON(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(
+        `Network error: ${response.status} - ${response.statusText}`,
+      );
     }
+    return response.json();
+  }
 
-    update(state) {
-      if (!state.error) {
-        this.render(state.contributors);
-      }
-    }
-
-    /**
-     * Renders the list of contributors
-     * @param {Object[]} contributors An array of contributor objects
-     */
-    render(contributors) {
-      this.container.innerHTML = '';
-      createAndAppend('h4', this.container, {
-        text: 'Contributions:',
-      });
-
-      const ul = createAndAppend('ul', this.container);
-      if (contributors && contributors.length) {
-        contributors.forEach(contributor => {
-          const contributorItem = createAndAppend('li', ul, {
-            class: 'contributor-item',
-          });
-          const contributorLink = createAndAppend('a', contributorItem, {
-            href: contributor.html_url,
-            target: '_blank',
-          });
-          const contributorDiv = createAndAppend('div', contributorLink, {
-            class: 'contributor',
-          });
-          createAndAppend('img', contributorDiv, {
-            src: contributor.avatar_url,
-            class: 'contributor-avatar',
-          });
-          const contributorDetails = createAndAppend('div', contributorDiv, {
-            class: 'contributor-details',
-          });
-          createAndAppend('div', contributorDetails, {
-            text: contributor.login,
-            class: 'contributor-login',
-          });
-          createAndAppend('div', contributorDetails, {
-            text: contributor.contributions,
-            class: 'contributions-number',
-          });
-        });
+  function createAndAppend(name, parent, options = {}) {
+    const elem = document.createElement(name);
+    parent.appendChild(elem);
+    Object.entries(options).forEach(([key, value]) => {
+      if (key === 'text') {
+        elem.textContent = value;
       } else {
-        createAndAppend('div', this.container, {
-          text: 'N/A',
-          class: 'not-available',
-        });
+        elem.setAttribute(key, value);
       }
+    });
+    return elem;
+  }
+
+  function changeDateTimeFormat(dateTime) {
+    const timeFormat = new Date(dateTime);
+    return timeFormat.toLocaleString();
+  }
+
+  function addTableRow(table, header, value) {
+    const tr = createAndAppend('tr', table, { class: 'tr' });
+    createAndAppend('th', tr, { text: header, class: 'keys' });
+    createAndAppend('td', tr, { text: value, class: 'values' });
+    return tr;
+  }
+
+  function renderRepoDetails(repo, repoSection) {
+    repoSection.innerHTML = '';
+    const table = createAndAppend('table', repoSection, { class: 'table' });
+    const tr1 = addTableRow(table, 'Repository:', '');
+    createAndAppend('a', tr1.lastChild, {
+      href: repo.html_url,
+      text: repo.name,
+    });
+    addTableRow(table, 'Description:', repo.description);
+    addTableRow(table, 'Fork: ', repo.forks);
+    addTableRow(table, 'Updated:', changeDateTimeFormat(repo.updated_at));
+  }
+
+  async function renderContributorsDetails(contributorsUrl, ul, root) {
+    ul.innerHTML = '';
+    try {
+      const contributors = await fetchJSON(contributorsUrl);
+      contributors.forEach(contributor => {
+        const contributorLi = createAndAppend('li', ul, {
+          class: 'contributor-list',
+        });
+        createAndAppend('img', contributorLi, {
+          src: contributor.avatar_url,
+          alt: contributor.login,
+          class: 'contributor-image ',
+        });
+        createAndAppend('a', contributorLi, {
+          href: contributor.html_url,
+          text: contributor.login,
+          target: '_blank',
+          class: 'contributor-link ',
+        });
+        createAndAppend('div', contributorLi, {
+          href: contributor.html_url,
+          text: contributor.contributions,
+          class: 'contributor-div ',
+        });
+      });
+    } catch (err) {
+      createAndAppend('div', root, {
+        text: err.message,
+        class: 'alert-error',
+      });
     }
   }
-  window.ContributorsView = ContributorsView;
+
+  function renderSections(repo, repoList, contributorList) {
+    renderRepoDetails(repo, repoList);
+    renderContributorsDetails(repo.contributors_url, contributorList);
+  }
+
+  function sortAlpha(a, b) {
+    return a.name.localeCompare(b.name);
+  }
+
+  async function main(url) {
+    const root = document.getElementById('root');
+    const header = createAndAppend('header', root, {
+      class: 'header',
+    });
+    createAndAppend('span', header, {
+      text: 'HYF Repositories',
+      class: 'header-text',
+    });
+    const select = createAndAppend('select', header, { class: 'select-bar' });
+    const mainContainer = createAndAppend('main', root);
+    const repoSection = createAndAppend('section', mainContainer, {
+      class: 'repo-container',
+    });
+    const contributorSection = createAndAppend('section', mainContainer, {
+      class: 'contributors-container',
+    });
+    createAndAppend('h3', contributorSection, {
+      text: 'Contributions',
+      class: 'contributor-title',
+    });
+
+    const contributorUl = createAndAppend('ul', contributorSection);
+    try {
+      const repos = await fetchJSON(url);
+      const sortedRepos = repos.sort(sortAlpha);
+      sortedRepos.forEach((repo, index) => {
+        createAndAppend('option', select, {
+          text: repo.name,
+          value: index,
+        });
+      });
+      renderSections(repos[0], repoSection, contributorUl);
+      select.addEventListener('change', event => {
+        const selectedRepo = repos[event.target.value];
+        renderSections(selectedRepo, repoSection, contributorUl);
+      });
+    } catch (err) {
+      createAndAppend('div', root, {
+        text: err.message,
+        class: 'alert-error',
+      });
+    }
+  }
+
+  const HYF_REPOS_URL =
+    'https://api.github.com/orgs/HackYourFuture/repos?per_page=100';
+  window.onload = () => main(HYF_REPOS_URL);

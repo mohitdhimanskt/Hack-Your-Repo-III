@@ -1,142 +1,141 @@
-.alert-error { 
+.alert-error {
     color: red;
-    background-color: rgb(247, 111, 111);
-    font-weight: bold;
-    padding: 20px;
-    text-align: center;
+    width: 90%;
+    margin: 1% 5% 1% 5%;
+    padding: 30px 0 30px 0;
+    background: pink;
   }
   
-  .not-available { 
-    color: black;
-    background-color: rgb(247, 111, 111);
-    font-weight: bold;
-    padding: 20px;
-    text-align: center;
+  * {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
   }
   
   body {
-    box-sizing: border-box;
-    padding: 10px;
-    
+    background: white;
+    font-size: 20px;
+    line-height: 2;
   }
+  
   .header {
+    width: 81%;
+    margin: 0 auto;
+    padding: 20px 0px 20px 20px;
+    background: #3f51b5;
     color: white;
-    font-family: sans-serif;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 7px 15px;
-    margin-bottom: 15px;
-    background-color: blueviolet;
-    box-shadow: 0 0 10px rgb(87, 0, 0);
   }
-  .repo-select{
-    padding: 7px;
-    margin-left: 10px;
+  
+  .header div {
+    padding-left: 10px;
+  }
+  
+  .repo-select {
     margin: 10px;
-   
+    padding: 5px;
   }
+  
   .main-container {
+    width: 80%;
+    margin: 5px auto;
     display: flex;
-    flex-direction: column;
   }
   
-  .repo-container,
-  .contributors-container  {
-    padding: 10px;
-    margin-bottom: 10px;
-    box-shadow: 1px 0px 1px 2px lightsalmon;
+  .repo-container {
+    flex: 1;
+    margin-right: 5px;
   }
   
-  th {
-   text-align: left;
-    
+  .table {
+    box-shadow: -2px 2px 5px 5px rgba(128, 128, 128, 0.247);
+    width: 100%;
   }
-  .contributor-item {
-    padding: 8px 14px;
-    box-shadow: 1px 1px 1px 1px lightsalmon;
-    margin-bottom: 5px;
-    list-style: none;
-   
+  
+  .keys {
+    width: 20%;
+    padding: 0 10px;
+    text-align: left;
+    vertical-align: top;
   }
-  .contributor-item a {
-    text-decoration: none;
+  
+  .values {
+    width: 80%;
   }
-  .contributor-avatar {
-    height: 48px;
-    margin-right: 16px;
-  }
-  .contributor {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .contributor-details {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+  
+  .contributors-container {
+    box-shadow: -2px 2px 5px 5px rgba(128, 128, 128, 0.247);
     flex: 1;
   }
-  .contributor-login {
-    padding: 10px;
-    color: black;
+  
+  .contributor-image {
+    width: 80px;
+    padding: 20px;
+    border-radius: 26px;
   }
-  .contributions-number {
-    padding: 3px;
-    color: black;
-    background-color: gray;
+  
+  .contributor-link {
+    flex-grow: 1;
   }
-  .item {
-    list-style: none;
-    padding: 10px;
-    margin: 10px 0px;
+  
+  .contributor-div {
+    padding: 2px 13px;
+    margin-right: 15px;
+    background: grey;
+    border-radius: 5px;
+    color: white;
+    line-height: 1;
+    font-size: 16px;
   }
-  @media (min-width: 768px) {
-    body {
-      max-width: 90%;
-      margin: auto;
-    }
-    
-    #drop-list{
-      font-size: 2vw;
+  
+  .contributor-title {
+    color: grey;
+    font-size: 18px;
+    padding: 20px;
+  }
+  
+  .contributor-list {
+    list-style-type: none;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.459);
+    display: flex;
+    align-items: center;
+  }
+  
+  @media (max-width: 890px) {
+    .main-container {
+      font-size: 12px;
+      display: table;
+      width: 100%;
     }
   
-    .main-container {
-      flex-direction: row;
-      align-items: flex-start;
+    .header {
+      width: 100%;
+      flex-wrap: wrap;
     }
   
     .repo-container {
-      margin-right: 10px;
-      flex: 2;
-   }
+      width: 100%;
+    }
+  
     .contributors-container {
-      flex: 1;
-    }
-    
-  }
-  
-  @media (min-width: 1024px) {
-    body {
-      max-width: 80%;
-      font-size: 1.5vw;
+      margin-top: 5px;
+      width: 100%;
+      box-shadow: -2px 2px 5px rgba(128, 128, 128, 0.247);
     }
   
-    #drop-list{
-      font-size: 1.3vw;
-    }
-  }
-  
-  @media (min-width: 1440px) {
-    body {
-      max-width: 70%;
-      font-size: 1.5vw;
+    .table {
+      box-shadow: -2px 2px 5px rgba(128, 128, 128, 0.247);
     }
   
-    #drop-list{
-      font-size: 1.1vw;
+    .contributor-title {
+      font-size: 15px;
+    }
+  
+    .keys {
+      padding-left: 20px;
+    }
+  
+    .repo-select {
+      padding: 6px 0px;
     }
   }

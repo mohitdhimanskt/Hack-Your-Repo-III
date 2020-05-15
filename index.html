@@ -1,22 +1,53 @@
 <!DOCTYPE html>
-<html lang ="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="veiwport" content="width=device-width , initial-scale=1.0, maximum-scale=1.0, userscalable=no">
-        <meta name="theme-color" content="#000000" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="format-detection" content="telephone=no" />
-        <link rel="apple-touch-icon" href="./hyf.png" />
-        <link rel="shortcut icon" type="image/png" href="./hyf.png" />
-        <title>HYF-GITHUB</title>
-        <link href="https://fonts.googleapis.com/css?family=Roboto:400,700"
-        rel="stylesheet">
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div id="root"></div>
-        <script src="./Util.js"></script>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="apple-touch-icon" href="./hyf.png" />
+  <link rel="shortcut icon" type="image/png" href="./hyf.png" />
+  <title>HYF-GITHUB</title>
+  <link
+    href="https://fonts.googleapis.com/css?family=Roboto:400,700"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="./style1.css">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+
+<body>
+
+  <div class="root">
+      <div class="header">
+          <label for="repositories" id="HYF">HYF Repositories</label>
+          <select id="repositories">
+              <option selected="Choose Repository">Choose a Repository</option>
+          </select>
+          <div id="loading-icon"></div>
+      </div>
+
+      <div class="body2">
+          <div id="repo_info" class="repo_info"></div>
+
+          </div>
+
+          <div id="repo_contributors" class="repo_contributors">>
+            <div id="contributorList">           
+            </div>
+          </div>
+
+
+      </div>
+  </div>
+  <script src="./Util.js"></script>
     <script src="./Observable.js"></script>
     <script src="./Model.js"></script>
     <script src="./HeaderView.js"></script>
@@ -24,7 +55,8 @@
     <script src="./ContributorsView.js"></script>
     <script src="./ErrorView.js"></script>
     <script src="./App.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
-     <script src="index.js"></script>
-    </body>
-</html>
+    <script src="index.js"></script>
+</body>
+
+
+</html> 
