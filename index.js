@@ -153,7 +153,14 @@ async function fetchJSON(url) {
      createAndAppend('h4',this.container,{
        text: 'Contributions:',
      });
-     
+     const ul = createAndAppend('ul',this.container);
+     if(contributors && contributors.length){
+       contributors.forEach(contributor => {
+         const contributorLink = createAndAppend('li',ul,{
+            class: 'contributor-item',
+         })
+       })
+     }
    }
   }
   
