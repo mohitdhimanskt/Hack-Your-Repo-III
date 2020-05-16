@@ -197,4 +197,31 @@ async function fetchJSON(url) {
         error: null,
       };
     }
-   }
+    async fetchData(id) {
+      const repoId = parseInt(id, 10);
+      this.state.error = null;
+      try {
+        if (this.state.repos.length === 0) {
+          const repos = await Model.fetchJSON(makeUrl(this.account));
+          this.state.repos = repos.sort((a, b) => a.name.localeCompare(b.name));
+        }
+        const index = id
+          ? this.state.repos.findIndex(repo => repo.id === repoId)
+          : 0;
+        this.state.selectedRepo = this.state.repos[index];
+        this.state.contributors = await Model.fetchJSON(
+          this.state.selectedRepo.contributors_url,
+        );
+      } catch (err) {
+        this.state.error = err;
+      }
+      this.notify(this.state);
+    }
+
+    static async fetchJSON(url) {
+      const response = await axios.get(url);
+      return response.data;
+    }
+  }
+
+  window.Model = Model;
