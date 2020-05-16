@@ -231,4 +231,11 @@ async function fetchJSON(url) {
     constructor(container){
       this.container = container;
     }
+    update(state){
+      if(!state.error){
+        this.render(state.selectedRepo);
+
+      }
+    }
+    
   }
