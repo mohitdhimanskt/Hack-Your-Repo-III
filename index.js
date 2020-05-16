@@ -148,4 +148,12 @@ async function fetchJSON(url) {
         this.render(state.contributors);
       }
     }
+   render(contributors){
+     this.container.innerHTML = '';
+     createAndAppend('h4',this.container,{
+       text: 'Contributions:',
+     });
+     
+   }
   }
+  
