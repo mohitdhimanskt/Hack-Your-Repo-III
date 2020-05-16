@@ -237,5 +237,15 @@ async function fetchJSON(url) {
 
       }
     }
-    
+    /**
+     * Renders the repository details.
+     * @param {Object} repo A repository object.
+     */
+    render(repo){
+      this.container.innerHTML = '';
+      const table = createAndAppend('table',this.container, {
+        class: 'table',
+      });
+      
+    }
   }
