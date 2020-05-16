@@ -139,28 +139,46 @@ async function fetchJSON(url) {
 
   const { createAndAppend } = window.Util;
 
-  class ContributionsView {
-    constructor(container){
+  class ContributorsView {
+    constructor(container) {
       this.container = container;
     }
-    update(state){
-      if(!state.error){
+
+    update(state) {
+      if (!state.error) {
         this.render(state.contributors);
       }
     }
-   render(contributors){
-     this.container.innerHTML = '';
-     createAndAppend('h4',this.container,{
-       text: 'Contributions:',
-     });
-     const ul = createAndAppend('ul',this.container);
-     if(contributors && contributors.length){
-       contributors.forEach(contributor => {
-         const contributorLink = createAndAppend('li',ul,{
-            class: 'contributor-item',
-         })
-       })
-     }
-   }
+
+    /**
+     * Renders the list of contributors
+     * @param {Object[]} contributors An array of contributor objects
+     */
+    render(contributors) {
+      this.container.innerHTML = '';
+
+      contributors.forEach(contributor => {
+        const contributorLi = createAndAppend('li', this.container, {
+          class: 'contributor-list',
+        });
+        createAndAppend('img', contributorLi, {
+          src: contributor.avatar_url,
+          alt: contributor.login,
+          class: 'contributor-image ',
+        });
+        createAndAppend('a', contributorLi, {
+          href: contributor.html_url,
+          text: contributor.login,
+          target: '_blank',
+          class: 'contributor-link ',
+        });
+        createAndAppend('div', contributorLi, {
+          href: contributor.html_url,
+          text: contributor.contributions,
+          class: 'contributor-div ',
+        });
+      });
+    }
   }
-  
+
+  window.ContributorsView = ContributorsView;
