@@ -136,3 +136,16 @@ async function fetchJSON(url) {
   const HYF_REPOS_URL =
     'https://api.github.com/orgs/HackYourFuture/repos?per_page=100';
   window.onload = () => main(HYF_REPOS_URL);
+
+  const { createAndAppend } = window.Util;
+
+  class ContributionsView {
+    constructor(container){
+      this.container = container;
+    }
+    update(state){
+      if(!state.error){
+        this.render(state.contributors);
+      }
+    }
+  }
