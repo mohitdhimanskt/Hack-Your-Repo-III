@@ -225,3 +225,10 @@ async function fetchJSON(url) {
   }
 
   window.Model = Model;
+
+  const { createAndAppend } = window.Util;
+  class RepoView {
+    constructor(container){
+      this.container = container;
+    }
+  }
