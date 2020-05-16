@@ -186,4 +186,15 @@ async function fetchJSON(url) {
   const {Observable} = window;
   const makeUrl =({ name, type}) =>
   `https://api.github.com/${type}s/${name}/repos?per_page=100`;
-  
+   class Model extends Observable {
+    constructor(account) {
+      super();
+      this.account = account;
+      this.state = {
+        repos: [],
+        selectedRepo: null,
+        contributors: [],
+        error: null,
+      };
+    }
+   }
