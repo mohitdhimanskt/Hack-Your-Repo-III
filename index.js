@@ -1,276 +1,139 @@
-async function fetchJSON(url) {
-    const response = await fetch(url);
+function fetchJSON(url) {
+  return fetch(url).then(response => {
     if (!response.ok) {
-      throw new Error(
-        `Network error: ${response.status} - ${response.statusText}`,
-      );
+      throw new Error(`Error ${response.status} ${response.statusText}`);
     }
     return response.json();
-  }
+  });
+}
 
-  function createAndAppend(name, parent, options = {}) {
-    const elem = document.createElement(name);
-    parent.appendChild(elem);
-    Object.entries(options).forEach(([key, value]) => {
-      if (key === 'text') {
-        elem.textContent = value;
-      } else {
-        elem.setAttribute(key, value);
-      }
-    });
-    return elem;
-  }
+function createAndAppend(name, parent, options = {}) {
+  const elem = document.createElement(name);
+  parent.appendChild(elem);
+  Object.entries(options).forEach(([key, value]) => {
+    if (key === 'text') {
+      elem.textContent = value;
+    } else {
+      elem.setAttribute(key, value);
+    }
+  });
+  return elem;
+}
 
-  function changeDateTimeFormat(dateTime) {
-    const timeFormat = new Date(dateTime);
-    return timeFormat.toLocaleString();
-  }
+function renderRepoTable(table, name, path) {
+  const tr = createAndAppend('tr', table);
+  createAndAppend('th', tr, {
+    text: name,
+  });
+  createAndAppend('td', tr, {
+    text: path,
+  });
+  return tr;
+}
 
-  function addTableRow(table, header, value) {
-    const tr = createAndAppend('tr', table, { class: 'tr' });
-    createAndAppend('th', tr, { text: header, class: 'keys' });
-    createAndAppend('td', tr, { text: value, class: 'values' });
-    return tr;
-  }
+function renderRepoDetails(repo, table) {
+  const firstRow = renderRepoTable(table, 'Repository:', '');
+  createAndAppend('a', firstRow.lastChild, {
+    text: repo.name,
+    href: repo.html_url,
+    target: '_blank',
+  });
+  renderRepoTable(table, 'Description:', repo.description);
+  renderRepoTable(table, 'Forks:', repo.forks);
+  const date = new Date(repo.updated_at).toLocaleString('en-US');
+  renderRepoTable(table, 'Updated:', date);
+}
 
-  function renderRepoDetails(repo, repoSection) {
-    repoSection.innerHTML = '';
-    const table = createAndAppend('table', repoSection, { class: 'table' });
-    const tr1 = addTableRow(table, 'Repository:', '');
-    createAndAppend('a', tr1.lastChild, {
-      href: repo.html_url,
-      text: repo.name,
-    });
-    addTableRow(table, 'Description:', repo.description);
-    addTableRow(table, 'Fork: ', repo.forks);
-    addTableRow(table, 'Updated:', changeDateTimeFormat(repo.updated_at));
-  }
-
-  async function renderContributorsDetails(contributorsUrl, ul, root) {
-    ul.innerHTML = '';
-    try {
-      const contributors = await fetchJSON(contributorsUrl);
-      contributors.forEach(contributor => {
-        const contributorLi = createAndAppend('li', ul, {
-          class: 'contributor-list',
-        });
-        createAndAppend('img', contributorLi, {
-          src: contributor.avatar_url,
-          alt: contributor.login,
-          class: 'contributor-image ',
-        });
-        createAndAppend('a', contributorLi, {
-          href: contributor.html_url,
-          text: contributor.login,
-          target: '_blank',
-          class: 'contributor-link ',
-        });
-        createAndAppend('div', contributorLi, {
-          href: contributor.html_url,
-          text: contributor.contributions,
-          class: 'contributor-div ',
-        });
+async function renderContributors(url, div) {
+  try {
+    const responseContributors = await fetchJSON(url);
+    responseContributors.forEach(repo => {
+      const divContributor = createAndAppend('div', div, {
+        class: 'contributor-details',
       });
-    } catch (err) {
-      createAndAppend('div', root, {
-        text: err.message,
-        class: 'alert-error',
-      });
-    }
-  }
-
-  function renderSections(repo, repoList, contributorList) {
-    renderRepoDetails(repo, repoList);
-    renderContributorsDetails(repo.contributors_url, contributorList);
-  }
-
-  function sortAlpha(a, b) {
-    return a.name.localeCompare(b.name);
-  }
-
-  async function main(url) {
-    const root = document.getElementById('root');
-    const header = createAndAppend('header', root, {
-      class: 'header',
-    });
-    createAndAppend('span', header, {
-      text: 'HYF Repositories',
-      class: 'header-text',
-    });
-    const select = createAndAppend('select', header, { class: 'select-bar' });
-    const mainContainer = createAndAppend('main', root);
-    const repoSection = createAndAppend('section', mainContainer, {
-      class: 'repo-container',
-    });
-    const contributorSection = createAndAppend('section', mainContainer, {
-      class: 'contributors-container',
-    });
-    createAndAppend('h3', contributorSection, {
-      text: 'Contributions',
-      class: 'contributor-title',
-    });
-
-    const contributorUl = createAndAppend('ul', contributorSection);
-    try {
-      const repos = await fetchJSON(url);
-      const sortedRepos = repos.sort(sortAlpha);
-      sortedRepos.forEach((repo, index) => {
-        createAndAppend('option', select, {
-          text: repo.name,
-          value: index,
-        });
-      });
-      renderSections(repos[0], repoSection, contributorUl);
-      select.addEventListener('change', event => {
-        const selectedRepo = repos[event.target.value];
-        renderSections(selectedRepo, repoSection, contributorUl);
-      });
-    } catch (err) {
-      createAndAppend('div', root, {
-        text: err.message,
-        class: 'alert-error',
-      });
-    }
-  }
-
-  const HYF_REPOS_URL =
-    'https://api.github.com/orgs/HackYourFuture/repos?per_page=100';
-  window.onload = () => main(HYF_REPOS_URL);
-
-  const { createAndAppend } = window.Util;
-
-  class ContributorsView {
-    constructor(container) {
-      this.container = container;
-    }
-
-    update(state) {
-      if (!state.error) {
-        this.render(state.contributors);
-      }
-    }
-
-    /**
-     * Renders the list of contributors
-     * @param {Object[]} contributors An array of contributor objects
-     */
-    render(contributors) {
-      this.container.innerHTML = '';
-
-      contributors.forEach(contributor => {
-        const contributorLi = createAndAppend('li', this.container, {
-          class: 'contributor-list',
-        });
-        createAndAppend('img', contributorLi, {
-          src: contributor.avatar_url,
-          alt: contributor.login,
-          class: 'contributor-image ',
-        });
-        createAndAppend('a', contributorLi, {
-          href: contributor.html_url,
-          text: contributor.login,
-          target: '_blank',
-          class: 'contributor-link ',
-        });
-        createAndAppend('div', contributorLi, {
-          href: contributor.html_url,
-          text: contributor.contributions,
-          class: 'contributor-div ',
-        });
-      });
-    }
-  }
-
-  window.ContributorsView = ContributorsView;
-
-  const {Observable} = window;
-  const makeUrl =({ name, type}) =>
-  `https://api.github.com/${type}s/${name}/repos?per_page=100`;
-   class Model extends Observable {
-    constructor(account) {
-      super();
-      this.account = account;
-      this.state = {
-        repos: [],
-        selectedRepo: null,
-        contributors: [],
-        error: null,
-      };
-    }
-    async fetchData(id) {
-      const repoId = parseInt(id, 10);
-      this.state.error = null;
-      try {
-        if (this.state.repos.length === 0) {
-          const repos = await Model.fetchJSON(makeUrl(this.account));
-          this.state.repos = repos.sort((a, b) => a.name.localeCompare(b.name));
-        }
-        const index = id
-          ? this.state.repos.findIndex(repo => repo.id === repoId)
-          : 0;
-        this.state.selectedRepo = this.state.repos[index];
-        this.state.contributors = await Model.fetchJSON(
-          this.state.selectedRepo.contributors_url,
-        );
-      } catch (err) {
-        this.state.error = err;
-      }
-      this.notify(this.state);
-    }
-
-    static async fetchJSON(url) {
-      const response = await axios.get(url);
-      return response.data;
-    }
-  }
-
-  window.Model = Model;
-
-  const { createAndAppend } = window.Util;
-  class RepoView {
-    constructor(container){
-      this.container = container;
-    }
-    update(state){
-      if(!state.error){
-        this.render(state.selectedRepo);
-
-      }
-    }
-    /**
-     * Renders the repository details.
-     * @param {Object} repo A repository object.
-     */
-    render(repo) {
-      this.container.innerHTML = '';
-      const table = createAndAppend('table', this.container, {
-        class: 'table',
-      });
-      const tr1 = this.addTableRow(table, 'Repository:', '');
-      createAndAppend('a', tr1.lastChild, {
+      const linkContributor = createAndAppend('a', divContributor, {
         href: repo.html_url,
-        text: repo.name,
+        target: '_blank',
       });
-      this.addTableRow(table, 'Description:', repo.description);
-      this.addTableRow(table, 'Fork: ', repo.forks);
-      this.addTableRow(
-        table,
-        'Updated:',
-        this.changeDateTimeFormat(repo.updated_at),
-      );
-    }
-
-    changeDateTimeFormat(dateTime) {
-      const timeFormat = new Date(dateTime);
-      return timeFormat.toLocaleString();
-    }
-
-    addTableRow(table, header, value) {
-      const tr = createAndAppend('tr', table, { class: 'tr' });
-      createAndAppend('th', tr, { text: header, class: 'keys' });
-      createAndAppend('td', tr, { text: value, class: 'values' });
-      return tr;
-    }
+      createAndAppend('img', linkContributor, {
+        src: repo.avatar_url,
+        class: 'avatar',
+      });
+      createAndAppend('h4', linkContributor, {
+        text: repo.login,
+      });
+      createAndAppend('p', linkContributor, {
+        text: repo.contributions,
+        class: 'contribution-count',
+      });
+    });
+  } catch (error) {
+    createAndAppend('div', div, {
+      text: error.message,
+      class: 'alert-error',
+    });
   }
+}
 
-  window.RepoView = RepoView;
+function renderContent(repos, reposContainer, contributorContainer) {
+  reposContainer.innerHTML = '';
+  contributorContainer.innerHTML = '';
+  renderRepoDetails(repos, reposContainer);
+  contributorContainer.innerHTML = 'Contributors';
+  renderContributors(repos.contributors_url, contributorContainer);
+}
+async function main(url) {
+  const root = document.getElementById('root');
+  const header = createAndAppend('header', root, {
+    class: 'header-class',
+  });
+  createAndAppend('h3', header, {
+    text: 'HYF Repository',
+    class: 'title',
+  });
+  const select = createAndAppend('select', header, {
+    class: 'select-class',
+  });
+  const mainContainer = createAndAppend('section', root, {
+    class: 'main-container',
+  });
+  const reposContainer = createAndAppend('section', mainContainer, {
+    class: 'repos-container',
+  });
+  const contributorContainer = createAndAppend('section', mainContainer, {
+    class: 'contributor-container',
+  });
+
+  try {
+    const responseRepos = await fetchJSON(url);
+    responseRepos
+      .sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      })
+      .forEach((repo, index) => {
+        createAndAppend('option', select, {
+          value: index,
+          text: repo.name,
+          class: 'select-class',
+        });
+      });
+
+    renderContent(responseRepos[0], reposContainer, contributorContainer);
+    select.addEventListener('change', () => {
+      renderContent(
+        responseRepos[select.value],
+        reposContainer,
+        contributorContainer,
+      );
+    });
+  } catch (error) {
+    createAndAppend('div', root, {
+      text: error.message,
+      class: 'alert-error',
+    });
+  }
+}
+
+const HYF_REPOS_URL =
+  'https://api.github.com/orgs/HackYourFuture/repos?per_page=100';
+window.onload = () => main(HYF_REPOS_URL);
